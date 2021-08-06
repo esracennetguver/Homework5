@@ -1,0 +1,50 @@
+package business.concretes;
+
+import business.abstracts.CustomerCheckService;
+import business.abstracts.CustomerService;
+import business.abstracts.VerificationService;
+import dataAccess.abstracts.CustomerDao;
+import entities.concretes.Customer;
+
+public class CustomerManager implements CustomerService{
+
+	CustomerCheckService customerCheckService;
+	VerificationService mailVerificationService;
+	CustomerDao customerDao;
+	
+	public CustomerManager(CustomerCheckService customerCheckService, VerificationService mailVerificationService, CustomerDao customerDao) {
+		this.customerCheckService = customerCheckService;
+		this.mailVerificationService = mailVerificationService;
+		this.customerDao = customerDao;
+	}
+	
+	@Override
+	public void singUp(Customer customer) {
+		if (customerCheckService.isValid(customer) == true) {
+			System.out.print(customer.getFirstName() + " kullanıcısı başarıyla sisteme eklendi.\n");
+			mailVerificationService.sendMail(customer.getEMail());
+			customerDao.add(customer);
+		}
+		
+		
+	}
+
+	@Override
+	public void singIn(Customer customer) {
+		mailVerificationService.verifyMail(customer.getEMail());
+		
+		if (customerDao.getEmail(customer.getEMail()) && customerDao.getPassword(customer.getPassword())
+				&& mailVerificationService.isVerificated(customer.getEMail()) == true) {
+			System.out.println("Kullanıcı girişi başarıyla yapıldı.");
+		
+		} else if (mailVerificationService.isVerificated(customer.getEMail()) == false) {
+			System.out.println("Kullanıcı bilgileri doğru. Fakat mail adresi doğrulanmadığı için giriş yapılamıyor.");
+		} else {
+			System.out.println("Kullanıcı bilgileri yanlış, lütfen kontrol ediniz.");
+		}
+	
+
+		
+	}
+
+}
