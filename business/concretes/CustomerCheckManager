@@ -1,0 +1,99 @@
+package business.concretes;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import business.abstracts.CustomerCheckService;
+import entities.concretes.Customer;
+
+public class CustomerCheckManager implements CustomerCheckService {
+
+	List<String> listOfEmail = new ArrayList<String>();
+	
+	@Override
+	public boolean checkFirstName(Customer customer) {
+		if(customer.getFirstName().isEmpty()) {
+			System.out.println("İsim boş bırakılamaz");
+			return false;
+		}else {
+			if(customer.getFirstName().length()>2) {
+				System.out.println("isim en az 3 karakterli olmalıdır.");
+			return false;
+			}
+		}
+	
+			
+		return true;
+	}
+
+	@Override
+	public boolean checkLastName(Customer customer) {
+		if(customer.getLastName().isEmpty()) {
+			System.out.println("İsim boş bırakılamaz");
+			return false;
+		}else {
+			if(customer.getLastName().length()>1) {
+				System.out.println("isim en az 3 karakterli olmalıdır.");
+			return false;
+			}
+		}
+	
+			
+		return true;
+	}
+
+	@Override
+	public boolean checkEmail(Customer customer) {
+		String regex = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+.(com|org|net|edu|gov|mil|biz|info|mobi)(.[A-Z]{2})?$";
+		Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+
+		if (customer.getEMail().isEmpty()) {
+			System.out.println("Email alanı boş bırakılamaz.");
+			return false;
+		} else {
+			if (pattern.matcher(customer.getEMail()).find() == false) {
+				System.out.println("Girilen email adresi formata uygun değil. Örnek: ornek@ornek.com");
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public boolean checkPassword(Customer customer) {
+		if (customer.getPassword().isEmpty()) {
+			System.out.println("Soyisim alanı boş bırakılamaz.");
+			return false;
+		} else {
+			if (customer.getPassword().length() < 6) {
+				System.out.println("Parola 6 karakterden daha küçük olamaz.");
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public boolean UniqieEmail(Customer customer) {
+		boolean result=true;
+		if (listOfEmail.contains(customer.getEMail())) {
+			System.out.println("Bu mail adresi ile sisteme daha önce kayıt olunmuş, farklı bir mail adresi deneyiniz.");
+			result=false;
+		}else{
+			result=true;
+			listOfEmail.add(customer.getEMail());
+		}		
+		return result;
+	}
+
+	@Override
+	public boolean isValid(Customer customer) {
+		if (checkFirstName(customer) && checkLastName(customer) && checkEmail(customer) && checkPassword(customer)
+				&& UniqieEmail(customer) == true) {
+			return true;
+		}
+		return false;
+	}
+
+}
